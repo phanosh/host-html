@@ -1,5 +1,7 @@
 # host-html
 
+[![host-html.com](screenshot.png)](https://host-html.com)
+
 > **Publish any HTML file as a live link — instantly.**
 > No login. No config. No deploy pipeline.
 > → **[host-html.com](https://host-html.com)**
