@@ -1,0 +1,11 @@
+{
+  "name": "@phanosha/host-html",
+  "version": "1.0.0",
+  "description": "Skill for AI agents to publish HTML as hosted links via host-html",
+  "keywords": ["skills", "claude", "html", "hosting", "ai-agent"],
+  "repository": "https://github.com/phanosha/host-html",
+  "license": "MIT",
+  "skills": {
+    "hosthtml-publish": "skills/hosthtml-publish.skill.md"
+  }
+}
