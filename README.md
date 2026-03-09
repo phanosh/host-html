@@ -7,7 +7,7 @@ Publish any HTML file as a live hosted link — one command, zero config.
 ### Install the skill
 
 ```bash
-npx skills add phanosha/host-html --skill hosthtml-publish -g -y
+npx skills add phanosh/host-html --skill hosthtml-publish -g -y
 ```
 
 ### Use it
