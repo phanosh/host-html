@@ -1,6 +1,6 @@
 ---
 name: hosthtml-publish
-description: Publish HTML files as live hosted links via host-html.co
+description: Publish HTML files as live hosted links via host-html.comm
 version: 1.0.0
 triggers:
   - /host-html
@@ -42,7 +42,7 @@ curl -s -X POST "https://qtmscjnlixeyqalhzvde.supabase.co/functions/v1/publish" 
 **Response** (201 Created):
 ```json
 {
-  "url": "https://host-html.co/p/abc123",
+  "url": "https://host-html.com/p/abc123",
   "slug": "abc123",
   "edit_token": "...",
   "page_id": "...",
@@ -62,7 +62,7 @@ Format the output clearly:
 ```
 Published!
 
-URL: https://host-html.co/p/abc123
+URL: https://host-html.com/p/abc123
 Expires: March 13, 2026
 Edit token: (saved locally)
 ```

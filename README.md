@@ -38,7 +38,7 @@ curl -X POST https://qtmscjnlixeyqalhzvde.supabase.co/functions/v1/publish \
 
 ```json
 {
-  "url": "https://host-html.co/p/abc123",
+  "url": "https://host-html.com/p/abc123",
   "slug": "abc123",
   "edit_token": "64-char hex string",
   "page_id": "uuid",
