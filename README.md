@@ -1,52 +1,61 @@
 # host-html
 
-Publish any HTML file as a live hosted link — one command, zero config.
+> **Publish any HTML file as a live link — instantly.**
+> No login. No config. No deploy pipeline.
+> → **[host-html.com](https://host-html.com)**
 
-## For AI Agents (Claude Code, Cursor, etc.)
+---
 
-### Install the skill
+## For AI Agents
+
+Install once. Use everywhere.
 
 ```bash
-npx skills add phanosh/host-html --skill hosthtml-publish -g -y
+npx skills add phanosh/host-html -g -y
 ```
 
-### Use it
+Then just type:
 
 ```
 /host-html
 ```
 
-Your agent will find the HTML, publish it, and give you a live URL.
+Your agent finds the HTML, publishes it, and hands you a live URL in seconds.
+Works with **Claude Code**, Cursor, Codex, Copilot, and [40+ more agents](https://host-html.com).
 
-## Direct API Usage
+---
+
+## Direct API
 
 ```bash
 curl -X POST https://qtmscjnlixeyqalhzvde.supabase.co/functions/v1/publish \
   -H "Content-Type: application/json" \
-  -d '{"html": "<h1>Hello World</h1>", "title": "my-page"}'
+  -d '{"html": "<h1>Hello</h1>", "title": "my page"}'
 ```
 
-### Request
+**Request**
 
 | Field   | Type   | Required | Description                         |
 |---------|--------|----------|-------------------------------------|
-| `html`  | string | yes      | HTML content (max 1MB)              |
-| `title` | string | no       | Page title                          |
-| `slug`  | string | no       | Custom URL path (a-z, 0-9, hyphens) |
+| `html`  | string | ✓        | HTML content (max 1MB)              |
+| `title` | string |          | Page title                          |
+| `slug`  | string |          | Custom URL path (a-z, 0-9, hyphens) |
 
-### Response (201)
+**Response `201`**
 
 ```json
 {
   "url": "https://host-html.com/p/abc123",
   "slug": "abc123",
-  "edit_token": "64-char hex string",
-  "page_id": "uuid",
-  "expires_at": "2026-03-13T00:00:00.000Z"
+  "edit_token": "...",
+  "page_id": "...",
+  "expires_at": "2026-03-16T..."
 }
 ```
 
-Pages expire after 7 days on the free tier.
+Pages live for **7 days** on the free tier.
+
+---
 
 ## License
 
