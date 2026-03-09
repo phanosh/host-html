@@ -6,6 +6,6 @@
   "repository": "https://github.com/phanosh/host-html",
   "license": "MIT",
   "skills": {
-    "hosthtml-publish": "skills/hosthtml-publish.skill.md"
+    "hosthtml-publish": "skills/hosthtml-publish/SKILL.md"
   }
 }
