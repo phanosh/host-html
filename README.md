@@ -16,13 +16,16 @@ Install once. Use everywhere.
 npx skills add phanosh/host-html -g -y
 ```
 
-Then just type:
+Then use the skills:
 
 ```
-/host-html
+/host-html          # publish HTML as a live link
+/host-pdf           # export HTML slides to PDF
 ```
 
-Your agent finds the HTML, publishes it, and hands you a live URL in seconds.
+`/host-html` finds the HTML, publishes it, and hands you a live URL in seconds.
+`/host-pdf` captures each slide at retina quality and assembles a PDF.
+
 Works with **Claude Code**, Cursor, Codex, Copilot, and [40+ more agents](https://host-html.com).
 
 ---
