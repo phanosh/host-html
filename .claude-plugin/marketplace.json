@@ -1,0 +1,21 @@
+{
+  "name": "host-html",
+  "owner": {
+    "name": "Phanos Hadjikyriakou",
+    "email": "hadjikyriakou.phanos@gmail.com"
+  },
+  "metadata": {
+    "description": "Publish HTML as live links from Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "host-html",
+      "source": "./",
+      "description": "Publish HTML files as live hosted links via host-html.com. Includes /host-html and /host-pdf.",
+      "version": "1.0.0",
+      "category": "deployment",
+      "tags": ["html", "hosting", "slides", "pdf", "publish"],
+      "homepage": "https://host-html.com"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 ---
-name: hosthtml-pdf
+name: host-pdf
 description: Export host-html slide decks to PDF using Puppeteer
 version: 1.0.0
 triggers:
@@ -35,10 +35,10 @@ These commands are safe to run even if already installed.
 The export script is bundled with this skill. Run it:
 
 ```bash
-node "<SKILL_DIR>/export-pdf.mjs" "<INPUT_HTML>" "<OUTPUT_PDF>"
+node "${CLAUDE_PLUGIN_ROOT}/skills/hosthtml-pdf/export-pdf.mjs" "<INPUT_HTML>" "<OUTPUT_PDF>"
 ```
 
-- `<SKILL_DIR>` is the directory containing this SKILL.md file (i.e., the `skills/hosthtml-pdf/` directory inside the host-html package)
+- `${CLAUDE_PLUGIN_ROOT}` is the root directory where the plugin is installed (e.g., `~/.claude/plugins/cache/host-html`)
 - `<INPUT_HTML>` is the absolute path to the HTML file from Step 1
 - `<OUTPUT_PDF>` (optional) defaults to the same name/location as the input but with a `.pdf` extension
 
@@ -48,7 +48,7 @@ node "<SKILL_DIR>/export-pdf.mjs" "<INPUT_HTML>" "<OUTPUT_PDF>"
 Example:
 
 ```bash
-node "/path/to/skills/hosthtml-pdf/export-pdf.mjs" ./deck.html ./deck.pdf
+node "${CLAUDE_PLUGIN_ROOT}/skills/hosthtml-pdf/export-pdf.mjs" ./deck.html ./deck.pdf
 ```
 
 ## Step 4: Present the result

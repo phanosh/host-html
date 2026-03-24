@@ -1,0 +1,13 @@
+{
+  "name": "host-html",
+  "description": "Publish any HTML file as a live link instantly via host-html.com. Includes /host-html (publish to URL) and /host-pdf (export slides to PDF).",
+  "version": "1.0.0",
+  "author": {
+    "name": "Phanos Hadjikyriakou",
+    "email": "hadjikyriakou.phanos@gmail.com"
+  },
+  "homepage": "https://host-html.com",
+  "repository": "https://github.com/phanosh/host-html",
+  "license": "MIT",
+  "keywords": ["html", "hosting", "publish", "slides", "pdf", "deploy", "ai-artifacts"]
+}

@@ -1,6 +1,6 @@
 ---
-name: hosthtml-publish
-description: Publish HTML files as live hosted links via host-html.comm
+name: host-html
+description: Publish HTML files as live hosted links via host-html.com
 version: 1.0.0
 triggers:
   - /host-html

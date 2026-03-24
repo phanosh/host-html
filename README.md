@@ -8,10 +8,20 @@
 
 ---
 
-## For AI Agents
+## Install
 
-Install once. Use everywhere.
+### Claude Code (Official Plugin)
+```
+/plugin install host-html@claude-plugins-official
+```
 
+### Direct Install (before official listing)
+```
+/plugin marketplace add phanosh/host-html
+/plugin install host-html@host-html
+```
+
+### Other AI Agents (Skills)
 ```bash
 npx skills add phanosh/host-html -g -y
 ```
