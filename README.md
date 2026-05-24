@@ -43,7 +43,7 @@ Works with **Claude Code**, Cursor, Codex, Copilot, and [40+ more agents](https:
 ## Direct API
 
 ```bash
-curl -X POST https://qtmscjnlixeyqalhzvde.supabase.co/functions/v1/publish \
+curl -X POST https://suifgsvtcbrawzdhyuhk.supabase.co/functions/v1/publish \
   -H "Content-Type: application/json" \
   -d '{"html": "<h1>Hello</h1>", "title": "my page"}'
 ```

@@ -40,7 +40,7 @@ HTML
 )" \
             '{html: $html, title: $title}')
           response=$(curl -sS -w "\n%{http_code}" -X POST \
-            "https://qtmscjnlixeyqalhzvde.supabase.co/functions/v1/publish" \
+            "https://suifgsvtcbrawzdhyuhk.supabase.co/functions/v1/publish" \
             -H "Content-Type: application/json" \
             -d "$payload")
           body=$(echo "$response" | head -n -1)

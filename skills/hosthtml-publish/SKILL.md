@@ -1,7 +1,7 @@
 ---
 name: host-html
 description: Publish HTML files as live hosted links via host-html.com
-version: 1.1.0
+version: 1.1.1
 triggers:
   - /host-html
 ---
@@ -29,7 +29,7 @@ Read the full contents of the HTML file. The content must be:
 Make a POST request to the host-html publish API:
 
 ```bash
-curl -s -X POST "https://qtmscjnlixeyqalhzvde.supabase.co/functions/v1/publish" \
+curl -s -X POST "https://suifgsvtcbrawzdhyuhk.supabase.co/functions/v1/publish" \
   -H "Content-Type: application/json" \
   -d "{\"html\": \"<FULL_HTML_CONTENT>\", \"title\": \"<OPTIONAL_TITLE>\"}"
 ```
