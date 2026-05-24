@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Publish HTML via the host-html API
         id: publish
+        env:
+          ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1aWZnc3Z0Y2JyYXd6ZGh5dWhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0MjM2MTQsImV4cCI6MjA5NDk5OTYxNH0.wWploAOhZ0BjCbOoMWe8g11Qx-ZE3_Kj20h0kM8My1M
         run: |
           set -euo pipefail
           payload=$(jq -n \
@@ -40,7 +42,9 @@ HTML
 )" \
             '{html: $html, title: $title}')
           response=$(curl -sS -w "\n%{http_code}" -X POST \
-            "https://qtmscjnlixeyqalhzvde.supabase.co/functions/v1/publish" \
+            "https://suifgsvtcbrawzdhyuhk.supabase.co/functions/v1/publish" \
+            -H "Authorization: Bearer $ANON_KEY" \
+            -H "apikey: $ANON_KEY" \
             -H "Content-Type: application/json" \
             -d "$payload")
           body=$(echo "$response" | head -n -1)

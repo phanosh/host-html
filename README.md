@@ -42,8 +42,14 @@ Works with **Claude Code**, Cursor, Codex, Copilot, and [40+ more agents](https:
 
 ## Direct API
 
+The publish edge function expects the public Supabase anon JWT in the `Authorization` and `apikey` headers (this key is safe to share — it's designed for client-side use):
+
 ```bash
-curl -X POST https://qtmscjnlixeyqalhzvde.supabase.co/functions/v1/publish \
+ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1aWZnc3Z0Y2JyYXd6ZGh5dWhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0MjM2MTQsImV4cCI6MjA5NDk5OTYxNH0.wWploAOhZ0BjCbOoMWe8g11Qx-ZE3_Kj20h0kM8My1M"
+
+curl -X POST https://suifgsvtcbrawzdhyuhk.supabase.co/functions/v1/publish \
+  -H "Authorization: Bearer $ANON_KEY" \
+  -H "apikey: $ANON_KEY" \
   -H "Content-Type: application/json" \
   -d '{"html": "<h1>Hello</h1>", "title": "my page"}'
 ```

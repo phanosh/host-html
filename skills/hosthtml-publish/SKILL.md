@@ -1,7 +1,7 @@
 ---
 name: host-html
 description: Publish HTML files as live hosted links via host-html.com
-version: 1.1.0
+version: 1.2.0
 triggers:
   - /host-html
 ---
@@ -26,10 +26,14 @@ Read the full contents of the HTML file. The content must be:
 
 ## Step 3: Publish via API
 
-Make a POST request to the host-html publish API:
+Make a POST request to the host-html publish API. The endpoint requires the public Supabase anon JWT in both the `Authorization` and `apikey` headers — this key is designed to be embedded in client code and is safe to ship in this skill:
 
 ```bash
-curl -s -X POST "https://qtmscjnlixeyqalhzvde.supabase.co/functions/v1/publish" \
+ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1aWZnc3Z0Y2JyYXd6ZGh5dWhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0MjM2MTQsImV4cCI6MjA5NDk5OTYxNH0.wWploAOhZ0BjCbOoMWe8g11Qx-ZE3_Kj20h0kM8My1M"
+
+curl -s -X POST "https://suifgsvtcbrawzdhyuhk.supabase.co/functions/v1/publish" \
+  -H "Authorization: Bearer $ANON_KEY" \
+  -H "apikey: $ANON_KEY" \
   -H "Content-Type: application/json" \
   -d "{\"html\": \"<FULL_HTML_CONTENT>\", \"title\": \"<OPTIONAL_TITLE>\"}"
 ```
@@ -74,6 +78,7 @@ Edit token: (saved locally)
 ## Error Handling
 
 - If the API returns 400: Check that `html` is non-empty and under 1MB, and that any `slug` matches `^[a-z0-9-]{2,64}$`
+- If the API returns 401 (`UNAUTHORIZED_NO_AUTH_HEADER` or `UNAUTHORIZED_INVALID_JWT_FORMAT`): The `Authorization: Bearer <ANON_KEY>` and `apikey: <ANON_KEY>` headers are missing or malformed — re-send the request with both headers set to the anon JWT above
 - If the API returns 409: The custom slug is taken — retry without a slug or suggest a different one
 - If the API returns 500: Report the error and suggest trying again
 
