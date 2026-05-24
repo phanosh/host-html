@@ -1,7 +1,7 @@
 {
   "name": "host-html",
   "description": "Publish any HTML file as a live link instantly via host-html.com. Includes /host-html (publish to URL) and /host-pdf (export slides to PDF).",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "author": {
     "name": "Phanos Hadjikyriakou",
     "email": "hadjikyriakou.phanos@gmail.com"
