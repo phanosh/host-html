@@ -40,6 +40,30 @@ Works with **Claude Code**, Cursor, Codex, Copilot, and [40+ more agents](https:
 
 ---
 
+## Update
+
+When a new version is released here, pull it into your local Claude Code with:
+
+```
+/plugin marketplace update phanosh/host-html
+```
+
+That single command refreshes the marketplace catalog and installs any version bumps in `marketplace.json`, `plugin.json`, or the skill frontmatter. To check what you're on:
+
+```
+/plugin
+```
+
+To stay current automatically, open `/plugin`, go to the **Marketplaces** tab, select `phanosh/host-html`, and toggle **auto-update** on — Claude Code will then pull updates on startup.
+
+For the standalone skills install (`npx skills add ...`), re-run the same command to upgrade:
+
+```bash
+npx skills add phanosh/host-html -g -y
+```
+
+---
+
 ## Direct API
 
 The publish edge function expects the public Supabase anon JWT in the `Authorization` and `apikey` headers (this key is safe to share — it's designed for client-side use):
