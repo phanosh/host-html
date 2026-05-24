@@ -1,0 +1,94 @@
+name: API smoke test
+
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: Page title
+        default: host-html skill smoke test
+      slug:
+        description: Optional slug (leave blank for random)
+        default: ""
+  push:
+    branches:
+      - claude/skill-api-smoke-test-v2
+    paths:
+      - .github/workflows/api-smoke-test.yml
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish HTML via the host-html API
+        id: publish
+        run: |
+          set -euo pipefail
+          payload=$(jq -n \
+            --arg title "${{ github.event.inputs.title || 'host-html skill smoke test' }}" \
+            --arg slug "${{ github.event.inputs.slug || '' }}" \
+            --arg html "$(cat <<'HTML'
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>host-html skill smoke test</title>
+  <style>
+    body{font-family:system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,#0b1220,#1a2540);color:#e6edf3;display:grid;place-items:center;min-height:100vh;margin:0}
+    .box{text-align:center;padding:2rem 3rem;border:1px solid rgba(255,255,255,.08);border-radius:18px;backdrop-filter:blur(8px)}
+    h1{font-size:3rem;margin:.25rem}
+    .tag{opacity:.7;font-size:.95rem}
+    code{background:rgba(255,255,255,.06);padding:.15rem .4rem;border-radius:6px}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Hello from /host-html</h1>
+    <p class="tag">Published via the <code>host-html</code> Claude Code skill smoke test.</p>
+    <p class="tag">Run from GitHub Actions on ${{ github.run_id }}.</p>
+  </div>
+</body>
+</html>
+HTML
+)" \
+            '{html: $html, title: $title} + (if $slug == "" then {} else {slug: $slug} end)')
+          echo "$payload" | jq '.html |= (.[0:80] + "...")'
+          response=$(curl -sS -w "\n%{http_code}" -X POST \
+            "https://qtmscjnlixeyqalhzvde.supabase.co/functions/v1/publish" \
+            -H "Content-Type: application/json" \
+            -d "$payload")
+          body=$(echo "$response" | head -n -1)
+          status=$(echo "$response" | tail -n 1)
+          echo "HTTP $status"
+          echo "$body" | jq .
+          if [ "$status" != "201" ] && [ "$status" != "200" ]; then
+            echo "Publish failed"; exit 1
+          fi
+          url=$(echo "$body" | jq -r .url)
+          expires=$(echo "$body" | jq -r .expires_at)
+          slug_out=$(echo "$body" | jq -r .slug)
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "expires=$expires" >> "$GITHUB_OUTPUT"
+          echo "slug=$slug_out" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Published"
+            echo
+            echo "- URL: $url"
+            echo "- Slug: \`$slug_out\`"
+            echo "- Expires at: $expires"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Verify the page is live
+        run: |
+          set -euo pipefail
+          url="${{ steps.publish.outputs.url }}"
+          for i in 1 2 3 4 5; do
+            code=$(curl -s -o /tmp/page.html -w "%{http_code}" "$url")
+            echo "GET $url -> $code"
+            if [ "$code" = "200" ]; then
+              head -c 400 /tmp/page.html
+              echo
+              echo "Live URL works: $url" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Page did not return 200 after retries"; exit 1
