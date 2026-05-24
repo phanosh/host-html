@@ -1,7 +1,7 @@
 ---
 name: host-html
 description: Publish HTML files as live hosted links via host-html.com
-version: 1.0.0
+version: 1.1.0
 triggers:
   - /host-html
 ---
@@ -37,7 +37,9 @@ curl -s -X POST "https://qtmscjnlixeyqalhzvde.supabase.co/functions/v1/publish" 
 **Request body:**
 - `html` (required): The full HTML content as a string. Escape any quotes/special chars for JSON.
 - `title` (optional): A human-readable title for the page.
-- `slug` (optional): A custom URL path (lowercase alphanumeric + hyphens, 2-64 chars).
+- `slug` (optional): A custom URL path matching `^[a-z0-9-]{2,64}$` (lowercase alphanumerics and hyphens; leading/trailing/consecutive hyphens are accepted by the API).
+
+The API silently drops unknown fields — don't pass options that aren't listed above and expect them to take effect.
 
 **Response** (201 Created):
 ```json
@@ -50,11 +52,13 @@ curl -s -X POST "https://qtmscjnlixeyqalhzvde.supabase.co/functions/v1/publish" 
 }
 ```
 
+The `url` field is the canonical public link — use it as-is. Don't rewrite or substitute the host.
+
 ## Step 4: Present the result
 
 Show the user:
-1. **Live URL**: The `url` from the response — this is the public link to their page
-2. **Expiry**: The page expires in 7 days (mention the date from `expires_at`)
+1. **Live URL**: The `url` from the response — this is the public link to their page, use it verbatim
+2. **Expiry**: Read the date from `expires_at` and present it human-readably. Don't hardcode a duration like "7 days" — the API decides when the page expires and that may change.
 3. **Edit token**: Save `edit_token` — it's needed to update the page later
 
 Format the output clearly:
@@ -63,13 +67,13 @@ Format the output clearly:
 Published!
 
 URL: https://host-html.com/p/abc123
-Expires: March 13, 2026
+Expires: March 13, 2026   (from expires_at)
 Edit token: (saved locally)
 ```
 
 ## Error Handling
 
-- If the API returns 400: Check that `html` is non-empty and under 1MB
+- If the API returns 400: Check that `html` is non-empty and under 1MB, and that any `slug` matches `^[a-z0-9-]{2,64}$`
 - If the API returns 409: The custom slug is taken — retry without a slug or suggest a different one
 - If the API returns 500: Report the error and suggest trying again
 

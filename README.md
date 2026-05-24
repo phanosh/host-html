@@ -50,11 +50,11 @@ curl -X POST https://qtmscjnlixeyqalhzvde.supabase.co/functions/v1/publish \
 
 **Request**
 
-| Field   | Type   | Required | Description                         |
-|---------|--------|----------|-------------------------------------|
-| `html`  | string | ✓        | HTML content (max 1MB)              |
-| `title` | string |          | Page title                          |
-| `slug`  | string |          | Custom URL path (a-z, 0-9, hyphens) |
+| Field   | Type   | Required | Description                                  |
+|---------|--------|----------|----------------------------------------------|
+| `html`  | string | ✓        | HTML content (max 1MB)                       |
+| `title` | string |          | Page title                                   |
+| `slug`  | string |          | Custom URL path matching `^[a-z0-9-]{2,64}$` |
 
 **Response `201`**
 
@@ -68,7 +68,7 @@ curl -X POST https://qtmscjnlixeyqalhzvde.supabase.co/functions/v1/publish \
 }
 ```
 
-Pages live for **7 days** on the free tier.
+The response's `expires_at` is the authoritative expiry — read it from the response rather than assuming a fixed duration.
 
 ---
 
