@@ -12,7 +12,7 @@
       "name": "host-html",
       "source": "./",
       "description": "Publish HTML files as live hosted links via host-html.com. Includes /host-html and /host-pdf.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "category": "deployment",
       "tags": ["html", "hosting", "slides", "pdf", "publish"],
       "homepage": "https://host-html.com"
