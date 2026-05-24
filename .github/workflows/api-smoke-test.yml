@@ -2,18 +2,7 @@ name: API smoke test
 
 on:
   workflow_dispatch:
-    inputs:
-      title:
-        description: Page title
-        default: host-html skill smoke test
-      slug:
-        description: Optional slug (leave blank for random)
-        default: ""
   push:
-    branches:
-      - claude/skill-api-smoke-test-v2
-    paths:
-      - .github/workflows/api-smoke-test.yml
 
 jobs:
   publish:
@@ -24,8 +13,7 @@ jobs:
         run: |
           set -euo pipefail
           payload=$(jq -n \
-            --arg title "${{ github.event.inputs.title || 'host-html skill smoke test' }}" \
-            --arg slug "${{ github.event.inputs.slug || '' }}" \
+            --arg title "host-html skill smoke test" \
             --arg html "$(cat <<'HTML'
 <!DOCTYPE html>
 <html>
@@ -50,8 +38,7 @@ jobs:
 </html>
 HTML
 )" \
-            '{html: $html, title: $title} + (if $slug == "" then {} else {slug: $slug} end)')
-          echo "$payload" | jq '.html |= (.[0:80] + "...")'
+            '{html: $html, title: $title}')
           response=$(curl -sS -w "\n%{http_code}" -X POST \
             "https://qtmscjnlixeyqalhzvde.supabase.co/functions/v1/publish" \
             -H "Content-Type: application/json" \
@@ -76,6 +63,31 @@ HTML
             echo "- Slug: \`$slug_out\`"
             echo "- Expires at: $expires"
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: Comment result on PR
+        if: github.event_name == 'push' && github.ref_name != 'main'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          URL: ${{ steps.publish.outputs.url }}
+          SLUG: ${{ steps.publish.outputs.slug }}
+          EXPIRES: ${{ steps.publish.outputs.expires }}
+        run: |
+          set -euo pipefail
+          pr_number=$(curl -sS -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls?head=${{ github.repository_owner }}:${{ github.ref_name }}&state=open" \
+            | jq -r '.[0].number // empty')
+          if [ -z "$pr_number" ]; then
+            echo "No PR found for ${{ github.ref_name }}"; exit 0
+          fi
+          body=$(jq -nc \
+            --arg url "$URL" \
+            --arg slug "$SLUG" \
+            --arg expires "$EXPIRES" \
+            '{body: ("**API smoke test passed**\n\n- URL: \($url)\n- Slug: `\($slug)`\n- Expires: \($expires)")}')
+          curl -sS -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${pr_number}/comments" \
+            -d "$body"
       - name: Verify the page is live
         run: |
           set -euo pipefail
