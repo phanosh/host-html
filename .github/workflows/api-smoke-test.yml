@@ -9,6 +9,11 @@ on:
       slug:
         description: Optional slug (leave blank for random)
         default: ""
+  push:
+    branches:
+      - claude/skill-api-smoke-test
+    paths:
+      - .github/workflows/api-smoke-test.yml
 
 jobs:
   publish:
