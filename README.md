@@ -10,16 +10,13 @@
 
 ## Install
 
-### Claude Code (Official Plugin)
-```
-/plugin install host-html@claude-plugins-official
-```
-
-### Direct Install (before official listing)
+### Claude Code
 ```
 /plugin marketplace add phanosh/host-html
 /plugin install host-html@host-html
 ```
+
+> The official Claude Code marketplace listing is in the works — until it lands, install directly from this repo with the two commands above.
 
 ### Other AI Agents (Skills)
 ```bash
