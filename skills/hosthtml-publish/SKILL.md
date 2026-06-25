@@ -41,7 +41,7 @@ curl -s -X POST "https://suifgsvtcbrawzdhyuhk.supabase.co/functions/v1/publish" 
 **Request body:**
 - `html` (required): The full HTML content as a string. Escape any quotes/special chars for JSON.
 - `title` (optional): A human-readable title for the page.
-- `slug` (optional): A custom URL path matching `^[a-z0-9-]{2,64}$` (lowercase alphanumerics and hyphens; leading/trailing/consecutive hyphens are accepted by the API).
+- `slug` (optional): A custom URL path matching `^[a-z0-9-]{2,64}$` (lowercase alphanumerics and hyphens). **Custom slugs now require a signed-in account.** This skill publishes with the public anon key only — it has no user session — so sending a `slug` returns `401 "Sign in to pick a custom link — it's free"`. Anonymous publishing (no `slug`) always works and the API assigns a random slug. Only pass `slug` if the user has a way to authenticate the request; otherwise omit it and let the API generate one.
 
 The API silently drops unknown fields — don't pass options that aren't listed above and expect them to take effect.
 
@@ -63,7 +63,7 @@ The `url` field is the canonical public link — use it as-is. Don't rewrite or 
 Show the user:
 1. **Live URL**: The `url` from the response — this is the public link to their page, use it verbatim
 2. **Expiry**: Read the date from `expires_at` and present it human-readably. Don't hardcode a duration like "7 days" — the API decides when the page expires and that may change.
-3. **Edit token**: Save `edit_token` — it's needed to update the page later
+3. **Edit token**: Save `edit_token` — keep it with the page record. The API currently exposes publishing only (`POST`); there is no update/edit endpoint yet, so the token can't modify a live page today. Saving it now means the page is editable as soon as an update flow ships — don't tell the user they can edit it right now.
 
 Format the output clearly:
 
@@ -72,12 +72,13 @@ Published!
 
 URL: https://host-html.com/p/abc123
 Expires: March 13, 2026   (from expires_at)
-Edit token: (saved locally)
+Edit token: (saved for future edits)
 ```
 
 ## Error Handling
 
 - If the API returns 400: Check that `html` is non-empty and under 1MB, and that any `slug` matches `^[a-z0-9-]{2,64}$`
+- If the API returns 401 with a "Sign in to pick a custom link" message: A custom `slug` was sent but the request isn't authenticated (this skill only has the anon key). Drop the `slug` and re-publish — the API will assign a random one.
 - If the API returns 401 (`UNAUTHORIZED_NO_AUTH_HEADER` or `UNAUTHORIZED_INVALID_JWT_FORMAT`): The `Authorization: Bearer <ANON_KEY>` and `apikey: <ANON_KEY>` headers are missing or malformed — re-send the request with both headers set to the anon JWT above
 - If the API returns 409: The custom slug is taken — retry without a slug or suggest a different one
 - If the API returns 500: Report the error and suggest trying again
@@ -86,4 +87,4 @@ Edit token: (saved locally)
 
 - For the `title`, derive it from the HTML `<title>` tag if present, or the filename
 - If the HTML references external CSS/JS via relative paths, warn the user that only the HTML file is hosted — external assets need absolute URLs
-- The edit token is important — suggest the user save it if they want to update the page later
+- The edit token is worth saving for future edits, but the API has no update endpoint yet — don't promise the user they can change the page after publishing
