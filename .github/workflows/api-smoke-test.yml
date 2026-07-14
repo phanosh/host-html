@@ -10,10 +10,22 @@ jobs:
     steps:
       - name: Publish HTML via the host-html API
         id: publish
+        # Optional: publishing now requires an authenticated host-html account,
+        # so this end-to-end test needs a personal API key (format hh_… + 40
+        # chars) from host-html.com → Account → API keys. Set it as a repo
+        # secret named HOSTHTML_API_KEY (Settings → Secrets and variables →
+        # Actions → New repository secret) to enable the test. Without the
+        # secret the step skips cleanly — the job stays green.
         env:
-          ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1aWZnc3Z0Y2JyYXd6ZGh5dWhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0MjM2MTQsImV4cCI6MjA5NDk5OTYxNH0.wWploAOhZ0BjCbOoMWe8g11Qx-ZE3_Kj20h0kM8My1M
+          HOSTHTML_API_KEY: ${{ secrets.HOSTHTML_API_KEY }}
         run: |
           set -euo pipefail
+          if [ -z "${HOSTHTML_API_KEY:-}" ]; then
+            echo "No HOSTHTML_API_KEY secret set — skipping the end-to-end publish smoke test."
+            echo "Add a personal host-html API key as a repo secret named HOSTHTML_API_KEY to enable it."
+            echo "skipped=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           payload=$(jq -n \
             --arg title "host-html skill smoke test" \
             --arg html "$(cat <<'HTML'
@@ -43,8 +55,7 @@ HTML
             '{html: $html, title: $title}')
           response=$(curl -sS -w "\n%{http_code}" -X POST \
             "https://suifgsvtcbrawzdhyuhk.supabase.co/functions/v1/publish" \
-            -H "Authorization: Bearer $ANON_KEY" \
-            -H "apikey: $ANON_KEY" \
+            -H "Authorization: Bearer $HOSTHTML_API_KEY" \
             -H "Content-Type: application/json" \
             -d "$payload")
           body=$(echo "$response" | head -n -1)
@@ -68,7 +79,7 @@ HTML
             echo "- Expires at: $expires"
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Comment result on PR
-        if: github.event_name == 'push' && github.ref_name != 'main'
+        if: github.event_name == 'push' && github.ref_name != 'main' && steps.publish.outputs.url != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           URL: ${{ steps.publish.outputs.url }}
@@ -93,6 +104,7 @@ HTML
             "https://api.github.com/repos/${{ github.repository }}/issues/${pr_number}/comments" \
             -d "$body"
       - name: Verify the page is live
+        if: steps.publish.outputs.url != ''
         run: |
           set -euo pipefail
           url="${{ steps.publish.outputs.url }}"

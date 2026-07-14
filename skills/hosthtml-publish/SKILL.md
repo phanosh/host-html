@@ -1,7 +1,7 @@
 ---
 name: host-html
 description: Publish HTML files as live hosted links via host-html.com
-version: 1.2.0
+version: 2.0.0
 triggers:
   - /host-html
 ---
@@ -26,14 +26,28 @@ Read the full contents of the HTML file. The content must be:
 
 ## Step 3: Publish via API
 
-Make a POST request to the host-html publish API. The endpoint requires the public Supabase anon JWT in both the `Authorization` and `apikey` headers — this key is designed to be embedded in client code and is safe to ship in this skill:
+Make a POST request to the host-html publish API. Publishing now requires an
+authenticated, email-verified host-html account — pass a personal API key
+(format `hh_` + 40 characters) as the bearer token. Read it from the
+`HOSTHTML_API_KEY` environment variable; if it isn't set, stop and tell the
+user to create one (see "Setup" in the README) before retrying:
+
+> Publishing now requires a free host-html account. Sign up at
+> https://host-html.com, confirm your email, then go to Account → API keys →
+> Create key, and set `HOSTHTML_API_KEY` to the `hh_…` value
+> (e.g. `export HOSTHTML_API_KEY=hh_...`).
+
+Do not attempt the request without a key. Send **only** the
+`Authorization: Bearer` header — there is no longer an `apikey` header.
 
 ```bash
-ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1aWZnc3Z0Y2JyYXd6ZGh5dWhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0MjM2MTQsImV4cCI6MjA5NDk5OTYxNH0.wWploAOhZ0BjCbOoMWe8g11Qx-ZE3_Kj20h0kM8My1M"
+if [ -z "$HOSTHTML_API_KEY" ]; then
+  echo "Set HOSTHTML_API_KEY to a personal API key from host-html.com → Account → API keys."
+  exit 1
+fi
 
 curl -s -X POST "https://suifgsvtcbrawzdhyuhk.supabase.co/functions/v1/publish" \
-  -H "Authorization: Bearer $ANON_KEY" \
-  -H "apikey: $ANON_KEY" \
+  -H "Authorization: Bearer $HOSTHTML_API_KEY" \
   -H "Content-Type: application/json" \
   -d "{\"html\": \"<FULL_HTML_CONTENT>\", \"title\": \"<OPTIONAL_TITLE>\"}"
 ```
@@ -41,7 +55,7 @@ curl -s -X POST "https://suifgsvtcbrawzdhyuhk.supabase.co/functions/v1/publish" 
 **Request body:**
 - `html` (required): The full HTML content as a string. Escape any quotes/special chars for JSON.
 - `title` (optional): A human-readable title for the page.
-- `slug` (optional): A custom URL path matching `^[a-z0-9-]{2,64}$` (lowercase alphanumerics and hyphens). **Custom slugs now require a signed-in account.** This skill publishes with the public anon key only — it has no user session — so sending a `slug` returns `401 "Sign in to pick a custom link — it's free"`. Anonymous publishing (no `slug`) always works and the API assigns a random slug. Only pass `slug` if the user has a way to authenticate the request; otherwise omit it and let the API generate one.
+- `slug` (optional): A custom URL path matching `^[a-z0-9-]{2,64}$` (lowercase alphanumerics and hyphens). **Custom slugs still require the account to be Pro/Team.** Publishing with a personal API key from a free account works, but sending a `slug` returns a `401` telling the user to upgrade. If the authenticated account is on the free plan, drop `slug` and let the API assign a random one, or point the user at host-html.com pricing to upgrade.
 
 The API silently drops unknown fields — don't pass options that aren't listed above and expect them to take effect.
 
@@ -77,9 +91,18 @@ Edit token: (saved for future edits)
 
 ## Error Handling
 
+Auth errors return a JSON body shaped `{ "error": "<code>", "message": "<string>" }`.
+Always surface the server's `message` field to the user verbatim (the copy is
+server-owned and may change — don't paraphrase it), then add the guidance below.
+
+- **401 `auth_required`**: No `Authorization` header, or an unrecognized/garbled bearer token. Show the server `message`, then tell the user to generate a personal API key at host-html.com → Account → API keys and set it as `HOSTHTML_API_KEY` (`export HOSTHTML_API_KEY=hh_...`).
+- **401 `invalid_api_key`**: The token looks like an `hh_…` key but is unknown or revoked. Show the server `message`, then tell the user to check `HOSTHTML_API_KEY` or generate a new key — the old one may have been revoked.
+- **401 `project_anon_key_not_allowed`**: The token is the shared project anon/service-role key (the skill's old hardcoded credential). Show the server `message`; this means the skill or environment is still on the old key. Tell the user to set `HOSTHTML_API_KEY` to a personal `hh_…` key.
+- **403 `email_not_verified`**: Valid auth, but the account's email isn't confirmed. Show the server `message`, then tell the user to check their inbox, confirm their email, and retry.
+- **403 `account_suspended`**: The account has been suspended. Show the server `message` and do not retry automatically.
+- **503 `verification_check_failed`**: Transient server-side error while checking verification status. Show the server `message`; this is not a config problem — it's safe to retry once after a short pause.
+- If the API returns 401 with a "Sign in to pick a custom link" (or upgrade) message: A custom `slug` was sent but the authenticated account is on the free plan. Drop the `slug` and re-publish — the API will assign a random one — or point the user at host-html.com pricing.
 - If the API returns 400: Check that `html` is non-empty and under 1MB, and that any `slug` matches `^[a-z0-9-]{2,64}$`
-- If the API returns 401 with a "Sign in to pick a custom link" message: A custom `slug` was sent but the request isn't authenticated (this skill only has the anon key). Drop the `slug` and re-publish — the API will assign a random one.
-- If the API returns 401 (`UNAUTHORIZED_NO_AUTH_HEADER` or `UNAUTHORIZED_INVALID_JWT_FORMAT`): The `Authorization: Bearer <ANON_KEY>` and `apikey: <ANON_KEY>` headers are missing or malformed — re-send the request with both headers set to the anon JWT above
 - If the API returns 409: The custom slug is taken — retry without a slug or suggest a different one
 - If the API returns 500: Report the error and suggest trying again
 
