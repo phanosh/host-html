@@ -3,8 +3,14 @@
 [![host-html.com](screenshot.png)](https://host-html.com)
 
 > **Publish any HTML file as a live link — instantly.**
-> No login. No config. No deploy pipeline.
+> Free account required. No deploy pipeline, no server to manage.
 > → **[host-html.com](https://host-html.com)**
+
+> **Heads up — breaking change in v2.0.0:** Anonymous publishing has been
+> retired. Publishing now requires a free, email-verified host-html account
+> and a personal API key set as `HOSTHTML_API_KEY`. See
+> [Setup: get an API key](#setup-get-an-api-key). Older releases that relied
+> on the built-in shared key will stop publishing.
 
 ---
 
@@ -37,6 +43,25 @@ Works with **Claude Code**, Cursor, Codex, Copilot, and [40+ more agents](https:
 
 ---
 
+## Setup: get an API key
+
+Publishing now requires a free host-html account:
+
+1. Sign in (free) at [host-html.com](https://host-html.com)
+2. Confirm your email
+3. Go to **Account → API keys → Create key**
+4. Copy the generated key (starts with `hh_…` — shown once)
+5. Set it as an environment variable:
+
+   ```bash
+   export HOSTHTML_API_KEY=hh_your_key_here
+   ```
+
+The skill reads `HOSTHTML_API_KEY` automatically. Custom slugs (see the Direct
+API table below) still require a Pro/Team plan; publishing itself does not.
+
+---
+
 ## Update
 
 When a new version is released here, pull it into your local Claude Code with:
@@ -63,14 +88,13 @@ npx skills add phanosh/host-html -g -y
 
 ## Direct API
 
-The publish edge function expects the public Supabase anon JWT in the `Authorization` and `apikey` headers (this key is safe to share — it's designed for client-side use):
+The publish edge function requires a personal host-html API key (format
+`hh_…`) as the bearer token — see [Setup](#setup-get-an-api-key) to generate
+one. Pass it via the `Authorization` header (no `apikey` header is needed):
 
 ```bash
-ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1aWZnc3Z0Y2JyYXd6ZGh5dWhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0MjM2MTQsImV4cCI6MjA5NDk5OTYxNH0.wWploAOhZ0BjCbOoMWe8g11Qx-ZE3_Kj20h0kM8My1M"
-
 curl -X POST https://suifgsvtcbrawzdhyuhk.supabase.co/functions/v1/publish \
-  -H "Authorization: Bearer $ANON_KEY" \
-  -H "apikey: $ANON_KEY" \
+  -H "Authorization: Bearer $HOSTHTML_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"html": "<h1>Hello</h1>", "title": "my page"}'
 ```
