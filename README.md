@@ -119,7 +119,10 @@ curl -X POST https://suifgsvtcbrawzdhyuhk.supabase.co/functions/v1/publish \
 }
 ```
 
-The response's `expires_at` is the authoritative expiry — read it from the response rather than assuming a fixed duration.
+`expires_at` is `string | null`. On a free plan it is the ISO timestamp when the page goes
+dark; on a paid plan the page never expires and the field is `null`. It is the authoritative
+expiry — read it from the response rather than assuming a fixed duration, and handle the null
+rather than formatting it as a date.
 
 ---
 

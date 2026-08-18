@@ -72,11 +72,14 @@ The API silently drops unknown fields — don't pass options that aren't listed 
 
 The `url` field is the canonical public link — use it as-is. Don't rewrite or substitute the host.
 
+`expires_at` is `string | null` — an ISO timestamp on a free plan, and `null` on a paid plan,
+where the page never expires. Check for null before formatting it.
+
 ## Step 4: Present the result
 
 Show the user:
 1. **Live URL**: The `url` from the response — this is the public link to their page, use it verbatim
-2. **Expiry**: Read the date from `expires_at` and present it human-readably. Don't hardcode a duration like "7 days" — the API decides when the page expires and that may change.
+2. **Expiry**: Read `expires_at`. If it is a timestamp, present it human-readably; if it is `null`, the plan includes permanent hosting — say the page doesn't expire rather than printing a date. Don't hardcode a duration like "7 days" — the API decides when the page expires and that may change.
 3. **Edit token**: Save `edit_token` — keep it with the page record. The API currently exposes publishing only (`POST`); there is no update/edit endpoint yet, so the token can't modify a live page today. Saving it now means the page is editable as soon as an update flow ships — don't tell the user they can edit it right now.
 
 Format the output clearly:
@@ -85,7 +88,7 @@ Format the output clearly:
 Published!
 
 URL: https://host-html.com/p/abc123
-Expires: March 13, 2026   (from expires_at)
+Expires: March 13, 2026   (from expires_at; or "Never expires" when it is null)
 Edit token: (saved for future edits)
 ```
 
