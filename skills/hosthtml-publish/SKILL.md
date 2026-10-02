@@ -55,14 +55,14 @@ curl -s -X POST "https://suifgsvtcbrawzdhyuhk.supabase.co/functions/v1/publish" 
 **Request body:**
 - `html` (required): The full HTML content as a string. Escape any quotes/special chars for JSON.
 - `title` (optional): A human-readable title for the page.
-- `slug` (optional): A custom URL path matching `^[a-z0-9-]{2,64}$` (lowercase alphanumerics and hyphens). **Custom slugs still require the account to be Pro/Team.** Publishing with a personal API key from a free account works, but sending a `slug` returns a `401` telling the user to upgrade. If the authenticated account is on the free plan, drop `slug` and let the API assign a random one, or point the user at host-html.com pricing to upgrade.
+- `slug` (optional): A custom URL path matching `^[a-z0-9-]{2,64}$` (lowercase alphanumerics and hyphens). **Custom slugs still require a paid plan (Pro, Studio or Agency).** Publishing with a personal API key from a free account works, but sending a `slug` returns a `401` telling the user to upgrade. If the authenticated account is on the free plan, drop `slug` and let the API assign a random one, or point the user at host-html.com pricing to upgrade.
 
 The API silently drops unknown fields — don't pass options that aren't listed above and expect them to take effect.
 
 **Response** (201 Created):
 ```json
 {
-  "url": "https://host-html.com/p/abc123",
+  "url": "https://host-html-user.com/p/abc123",
   "slug": "abc123",
   "edit_token": "...",
   "page_id": "...",
@@ -87,7 +87,7 @@ Format the output clearly:
 ```
 Published!
 
-URL: https://host-html.com/p/abc123
+URL: https://host-html-user.com/p/abc123
 Expires: March 13, 2026   (from expires_at; or "Never expires" when it is null)
 Edit token: (saved for future edits)
 ```

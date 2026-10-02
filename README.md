@@ -39,6 +39,22 @@ Then use the skills:
 `/host-html` finds the HTML, publishes it, and hands you a live URL in seconds.
 `/host-pdf` captures each slide at retina quality and assembles a PDF.
 
+### MCP clients (Claude Desktop, Cursor, …)
+
+host-html also ships an MCP server, [`host-html-mcp`](https://www.npmjs.com/package/host-html-mcp):
+
+```json
+{
+  "mcpServers": {
+    "host-html": {
+      "command": "npx",
+      "args": ["-y", "host-html-mcp"],
+      "env": { "HOSTHTML_API_KEY": "hh_your_key_here" }
+    }
+  }
+}
+```
+
 Works with **Claude Code**, Cursor, Codex, Copilot, and [40+ more agents](https://host-html.com).
 
 ---
@@ -58,7 +74,7 @@ Publishing now requires a free host-html account:
    ```
 
 The skill reads `HOSTHTML_API_KEY` automatically. Custom slugs (see the Direct
-API table below) still require a Pro/Team plan; publishing itself does not.
+API table below) still require a paid plan (Pro, Studio or Agency); publishing itself does not.
 
 ---
 
@@ -111,7 +127,7 @@ curl -X POST https://suifgsvtcbrawzdhyuhk.supabase.co/functions/v1/publish \
 
 ```json
 {
-  "url": "https://host-html.com/p/abc123",
+  "url": "https://host-html-user.com/p/abc123",
   "slug": "abc123",
   "edit_token": "...",
   "page_id": "...",
