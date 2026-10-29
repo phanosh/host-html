@@ -56,6 +56,7 @@ curl -s -X POST "https://suifgsvtcbrawzdhyuhk.supabase.co/functions/v1/publish" 
 - `html` (required): The full HTML content as a string. Escape any quotes/special chars for JSON.
 - `title` (optional): A human-readable title for the page.
 - `slug` (optional): A custom URL path matching `^[a-z0-9-]{2,64}$` (lowercase alphanumerics and hyphens). **Custom slugs still require the account to be Pro/Team.** Publishing with a personal API key from a free account works, but sending a `slug` returns a `401` telling the user to upgrade. If the authenticated account is on the free plan, drop `slug` and let the API assign a random one, or point the user at host-html.com pricing to upgrade.
+- `password` (optional): Password-protects the page — visitors must enter this password to view it. 4–72 characters. The page's HTML is stored privately so the public link never exposes it, and the password is hashed server-side (it is not returned). **Password protection is a paid feature** (Pro/Team/Studio); a free account gets a `403 password_protection_not_allowed`. Only honoured when sent in the JSON body (never pass it in a URL). When set, the response includes `"has_password": true`.
 
 The API silently drops unknown fields — don't pass options that aren't listed above and expect them to take effect.
 
@@ -66,9 +67,13 @@ The API silently drops unknown fields — don't pass options that aren't listed 
   "slug": "abc123",
   "edit_token": "...",
   "page_id": "...",
+  "has_password": false,
   "expires_at": "2026-03-13T..."
 }
 ```
+
+`has_password` is `true` when the publish set a password (the page is locked and
+served from private storage), `false` otherwise.
 
 The `url` field is the canonical public link — use it as-is. Don't rewrite or substitute the host.
 
@@ -102,6 +107,8 @@ server-owned and may change — don't paraphrase it), then add the guidance belo
 - **401 `invalid_api_key`**: The token looks like an `hh_…` key but is unknown or revoked. Show the server `message`, then tell the user to check `HOSTHTML_API_KEY` or generate a new key — the old one may have been revoked.
 - **401 `project_anon_key_not_allowed`**: The token is the shared project anon/service-role key (the skill's old hardcoded credential). Show the server `message`; this means the skill or environment is still on the old key. Tell the user to set `HOSTHTML_API_KEY` to a personal `hh_…` key.
 - **403 `email_not_verified`**: Valid auth, but the account's email isn't confirmed. Show the server `message`, then tell the user to check their inbox, confirm their email, and retry.
+- **403 `password_protection_not_allowed`**: A `password` was sent, but the account's plan doesn't include password protection. Show the server `message`, then tell the user it's a paid feature — upgrade at host-html.com pricing, or re-publish without `password`.
+- **400 `invalid_password`**: The `password` is the wrong length. Show the server `message` (it states the 4–72 character range) and retry with a valid password.
 - **403 `account_suspended`**: The account has been suspended. Show the server `message` and do not retry automatically.
 - **503 `verification_check_failed`**: Transient server-side error while checking verification status. Show the server `message`; this is not a config problem — it's safe to retry once after a short pause.
 - If the API returns 401 with a "Sign in to pick a custom link" (or upgrade) message: A custom `slug` was sent but the authenticated account is on the free plan. Drop the `slug` and re-publish — the API will assign a random one — or point the user at host-html.com pricing.
