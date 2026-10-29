@@ -101,11 +101,12 @@ curl -X POST https://suifgsvtcbrawzdhyuhk.supabase.co/functions/v1/publish \
 
 **Request**
 
-| Field   | Type   | Required | Description                                  |
-|---------|--------|----------|----------------------------------------------|
-| `html`  | string | ✓        | HTML content (max 1MB)                       |
-| `title` | string |          | Page title                                   |
-| `slug`  | string |          | Custom URL path matching `^[a-z0-9-]{2,64}$` |
+| Field      | Type   | Required | Description                                                      |
+|------------|--------|----------|------------------------------------------------------------------|
+| `html`     | string | ✓        | HTML content (max 1MB)                                           |
+| `title`    | string |          | Page title                                                      |
+| `slug`     | string |          | Custom URL path matching `^[a-z0-9-]{2,64}$` (paid plans)        |
+| `password` | string |          | Password-protect the page (4–72 chars, paid plans, JSON body only) |
 
 **Response `201`**
 
@@ -115,9 +116,13 @@ curl -X POST https://suifgsvtcbrawzdhyuhk.supabase.co/functions/v1/publish \
   "slug": "abc123",
   "edit_token": "...",
   "page_id": "...",
+  "has_password": false,
   "expires_at": "2026-03-16T..."
 }
 ```
+
+`has_password` is `true` when the request set a `password` (the page is locked
+and served from private storage); `false` otherwise.
 
 `expires_at` is `string | null`. On a free plan it is the ISO timestamp when the page goes
 dark; on a paid plan the page never expires and the field is `null`. It is the authoritative
