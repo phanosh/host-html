@@ -24,6 +24,22 @@
 
 > The official Claude Code marketplace listing is in the works — until it lands, install directly from this repo with the two commands above.
 
+### Claude Desktop, Cursor, Codex (MCP server)
+```jsonc
+// claude_desktop_config.json / .cursor/mcp.json / .mcp.json
+{
+  "mcpServers": {
+    "host-html": {
+      "command": "npx",
+      "args": ["-y", "host-html-mcp"],
+      "env": { "HOSTHTML_API_KEY": "hh_your_key_here" }
+    }
+  }
+}
+```
+Two tools: `publish_html` (HTML in, link out) and `update_page` (new HTML, **same link**).
+Source and docs: [`mcp-server/`](mcp-server/) · npm: [`host-html-mcp`](https://www.npmjs.com/package/host-html-mcp)
+
 ### Other AI Agents (Skills)
 ```bash
 npx skills add phanosh/host-html -g -y
