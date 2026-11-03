@@ -1,0 +1,32 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "io.github.phanosh/host-html",
+  "title": "host-html",
+  "description": "Publish AI-generated HTML as a shareable link, and update it in place at the same URL.",
+  "websiteUrl": "https://host-html.com/api",
+  "repository": {
+    "url": "https://github.com/phanosh/host-html",
+    "source": "github",
+    "subfolder": "mcp-server"
+  },
+  "version": "0.2.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "host-html-mcp",
+      "version": "0.2.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "HOSTHTML_API_KEY",
+          "description": "Personal API key (hh_...) from host-html.com → Account → API keys",
+          "isRequired": true,
+          "isSecret": true,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}
